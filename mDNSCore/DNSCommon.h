@@ -24,6 +24,14 @@
 extern "C" {
 #endif
 
+#if (!defined(UINT32_C))
+#define UINT32_C(value) value##UL
+#endif
+
+#if (!defined(UINT32_MAX))
+#define UINT32_MAX UINT32_C(4294967295)
+#endif
+
 //*************************************************************************************************************
 // Macros
 

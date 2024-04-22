@@ -813,6 +813,8 @@ mDNSexport mDNSs32	mDNSPlatformUTC( void )
 	return ( mDNSs32 ) time( NULL );
 }
 
+ BOOL mDNSIsFileAndPrintSharingEnabled(BOOL *retry) { return FALSE; }
+
 //===========================================================================================================================
 //	getlocaltimestampfromplatformtime
 //===========================================================================================================================
@@ -1629,7 +1631,7 @@ mDNSexport void mDNSPlatformWriteLogMsg( const char * ident, const char * msg, m
 		default:				type = EVENTLOG_INFORMATION_TYPE;	break;
 	}
 
-	gMDNSRecord.p->reportStatusFunc( type, msg );
+	mDNSStorage.p->reportStatusFunc( type, msg );
 	dlog( kDebugLevelInfo, "%s\n", msg );
 	}
 
@@ -2283,11 +2285,11 @@ mStatus	SetupNiceName( mDNS * const inMDNS )
 	// if we can't find it in the registry, then use the hostname of the machine
 	if ( err || ( utf8[ 0 ] == '\0' ) )
 	{
-		TCHAR hostname[256];
+		TCHAR hostname[256] = TEXT("");
 		
-		namelen = sizeof( hostname ) / sizeof( TCHAR );
+		namelen = _countof(hostname);
 
-		ok = GetComputerNameExW( ComputerNamePhysicalDnsHostname, hostname, &namelen );
+		ok = GetComputerNameEx( ComputerNamePhysicalDnsHostname, hostname, &namelen );
 		err = translate_errno( ok, (mStatus) GetLastError(), kNameErr );
 		check_noerr( err );
 		
@@ -4620,7 +4622,7 @@ exit:
 #ifdef UNICODE
 mDNSlocal void GetDDNSDomains( DNameListElem ** domains, LPCWSTR lpSubKey )
 #else
-mDNSlocal void GetDDNSConfig( DNameListElem ** domains, LPCSTR lpSubKey )
+mDNSlocal void GetDDNSDomains(DNameListElem **domains, LPCSTR lpSubKey)
 #endif
 {
 	char		subKeyName[kRegistryMaxKeyLength + 1];
@@ -4866,7 +4868,7 @@ CheckFileShares( mDNS * const m )
 
 	require_action_quiet( m->AdvertiseLocalAddresses && !m->ShutdownTime, exit, err = kNoErr );
 
-	err = RegCreateKey(HKEY_CURRENT_USER, kServiceParametersNode L"\\Services\\SMB", &key);
+	err = RegCreateKey(HKEY_CURRENT_USER, kServiceParametersNode "\\Services\\SMB", &key);
 
 	if ( !err )
 	{

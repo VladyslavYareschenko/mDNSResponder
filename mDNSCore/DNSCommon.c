@@ -35,6 +35,7 @@
 // MARK: - Program Constants
 
 #include "mdns_strict.h"
+#include <cassert>
 
 mDNSexport const mDNSInterfaceID mDNSInterface_Any       = 0;
 mDNSexport const mDNSInterfaceID mDNSInterfaceMark       = (mDNSInterfaceID)-1;
@@ -3879,7 +3880,7 @@ mDNSexport void mDNS_Unlock_(mDNS *const m, const char *const functionname)
     // Check for locking failures
     if (m->mDNS_busy != m->mDNS_reentrancy)
     {
-        // If mDNS_busy becomes 4294967295U, which is (uint32_t)0 - 1. We are in an invalid lock state, crash
+        // If mDNS_busy becomes 4294967295U, which is . We are in an invalid lock state, crash
         // mDNSResponder immediately so that launchd can restart mDNSResponder accordingly without having the user
         // to reboot the system to get DNS back.
         // Also assert() ensures that we will get a crash trace when it happens.

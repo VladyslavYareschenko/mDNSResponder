@@ -24,10 +24,15 @@
 
 #include "dns_sd.h"             // Defines the interface to the client layer above
 #include "mDNSEmbeddedAPI.h"        // The interface we're building on top of
-#include <sys/socket.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <netinet/in.h>
+#include <sys/socket.h>
+#endif
 #include "DNSCommon.h"          // For mDNSPlatformInterfaceIndexfromInterfaceID().
-extern mDNS mDNSStorage;        // We need to pass the address of this storage to the lower-layer functions
+mDNS mDNSStorage;        // We need to pass the address of this storage to the lower-layer functions
 
 // If a target complies this file, then it should be using the shim layer.
 #define MDNS_BUILDINGSHAREDLIBRARY 1
@@ -100,8 +105,8 @@ typedef struct
 
 dnssd_sock_t DNSServiceRefSockFD(DNSServiceRef sdRef)
 {
-    (void)sdRef;    // Unused
-    return(0);
+    (void)sdRef;
+    return 0;
 }
 
 DNSServiceErrorType DNSServiceProcessResult(DNSServiceRef sdRef)
@@ -424,7 +429,7 @@ DNSServiceErrorType DNSServiceBrowse
 
     // Check parameters
     if (!regtype[0] || !MakeDomainNameFromDNSNameString(&t, regtype))      { errormsg = "Illegal regtype"; goto badparam; }
-    if (!MakeDomainNameFromDNSNameString(&d, *domain ? domain : "local.")) { errormsg = "Illegal domain";  goto badparam; }
+    if (!MakeDomainNameFromDNSNameString(&d, domain && *domain ? domain : "local.")) { errormsg = "Illegal domain";  goto badparam; }
 
     // Allocate memory, and handle failure
     x = (mDNS_DirectOP_Browse *) mDNSPlatformMemAllocateClear(sizeof(*x));

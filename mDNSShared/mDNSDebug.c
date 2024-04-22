@@ -74,7 +74,7 @@ mDNSlocal void LogMsgWithLevelv(const char *category, mDNSLogLevel_t level, cons
     const char *const lim = &buffer[512];
     if (category) mDNS_snprintf_add(&dst, lim, "%s: ", category);
     mDNS_vsnprintf(dst, (mDNSu32)(lim - dst), format, args);
-    mDNSPlatformWriteLogMsg(ProgramName, buffer, level);
+    mDNSPlatformWriteLogMsg(NULL, buffer, level);
 }
 #endif
 
