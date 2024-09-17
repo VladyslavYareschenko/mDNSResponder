@@ -18,7 +18,9 @@ if(NOT APPLE)
             $<INSTALL_INTERFACE:include/mDNSResponder>)
 
     if(UNIX)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DHAVE_IPV6 -DNOT_HAVE_SA_LEN -DUSES_NETLINK -DHAVE_LINUX -DTARGET_OS_LINUX")
+        set(UNIX_FLAGS "-D_GNU_SOURCE -DHAVE_IPV6 -DNOT_HAVE_SA_LEN -DUSES_NETLINK -DHAVE_LINUX -DTARGET_OS_LINUX")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${UNIX_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${UNIX_FLAGS}")
 
         list(APPEND MDNS_HEADERS mDNSCore/mDNSDebug.h mDNSPosix/mDNSPosix.h)
         list(APPEND MDNS_SOURCES mDNSPosix/mDNSPosix.c mDNSPosix/mDNSUNP.c mDNSShared/PlatformCommon.c)
@@ -26,7 +28,9 @@ if(NOT APPLE)
                 INTERFACE
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/mDNSPosix>)
     elseif(WIN32)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DWIN32_LEAN_AND_MEAN -DNOT_HAVE_SA_LEN -DTARGET_OS_WIN32")
+        set(WIN_FLAGS "-DWIN32_LEAN_AND_MEAN -DNOT_HAVE_SA_LEN -DTARGET_OS_WIN32")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WIN_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WIN_FLAGS}")
 
         list(APPEND MDNS_HEADERS mDNSShared/CommonServices.h mDNSCore/uDNS.h mDNSCore/DNSCommon.h mDNSWindows/Poll.h mDNSWindows/mDNSWin32.h mDNSWindows/VisualStudioSupport.h)
         list(APPEND MDNS_SOURCES mDNSWindows/mDNSWin32.c mDNSWindows/Secret.c mDNSWindows/Poll.c mDNSWindows/VisualStudioSupport.cpp)
